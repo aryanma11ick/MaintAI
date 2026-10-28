@@ -1,0 +1,39 @@
+services:
+  init:
+    build: .
+    command: python -m maintai bootstrap
+    volumes: ["maintai-data:/app/runtime"]
+  api:
+    build: .
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    ports: ["127.0.0.1:8000:8000"]
+    volumes: ["maintai-data:/app/runtime"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=10)"]
+      interval: 30s
+      timeout: 15s
+      start_period: 30s
+      retries: 3
+  worker:
+    build: .
+    command: python -m maintai worker
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    volumes: ["maintai-data:/app/runtime"]
+    restart: unless-stopped
+  dashboard:
+    build: .
+    command: python -m streamlit run maintai/dashboard.py --server.address 0.0.0.0 --server.port 8501 --server.headless true --browser.gatherUsageStats false
+    environment:
+      MAINTAI_API_URL: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    ports: ["127.0.0.1:8501:8501"]
+    restart: unless-stopped
+volumes:
+  maintai-data:
