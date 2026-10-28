@@ -1,0 +1,39 @@
+services:
+  init:
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    build: null
+    environment:
+      MAINTAI_HOME: /app/runtime
+      MAINTAI_DEMO_ENABLED: ${MAINTAI_DEMO_ENABLED:-false}
+    volumes:
+      - maintai-data:/app/runtime
+
+  api:
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    build: null
+    environment:
+      MAINTAI_HOME: /app/runtime
+      MAINTAI_DEMO_ENABLED: ${MAINTAI_DEMO_ENABLED:-false}
+    volumes:
+      - maintai-data:/app/runtime
+    ports:
+      - "127.0.0.1:8000:8000"
+
+  worker:
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    build: null
+    environment:
+      MAINTAI_HOME: /app/runtime
+      MAINTAI_DEMO_ENABLED: ${MAINTAI_DEMO_ENABLED:-false}
+    volumes:
+      - maintai-data:/app/runtime
+
+  dashboard:
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    build: null
+    environment:
+      MAINTAI_API_URL: http://api:8000
+      MAINTAI_DEMO_ENABLED: ${MAINTAI_DEMO_ENABLED:-false}
+    ports:
+      - "127.0.0.1:8501:8501"
+
