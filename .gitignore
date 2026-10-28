@@ -5,3 +5,4 @@ runtime/
 mlruns/
 *.log
 .env
+github_deployment.txt
